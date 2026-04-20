@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthmonth Gulsina ✨</title>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-pink: #ff2d55;
+            --accent-gold: #ffcc00;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #0c0a09;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #f8fafc;
+        }
+
+        /* --- Layer 1: Aurora Background --- */
+        .aurora-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at 50% 50%, #0c0a09 0%, #000 100%);
+        }
+
+        .aurora-layer {
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            filter: blur(80px);
+            opacity: 0.5;
+            z-index: -1;
+            mix-blend-mode: screen;
+            animation: drift 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0,0) rotate(0deg); }
+            100% { transform: translate(5%, 5%) rotate(10deg); }
+        }
+
+        .aurora-1 { background: radial-gradient(circle at 20% 30%, hsla(333,70%,55%,.4) 0%, transparent 50%); }
+        .aurora-2 { background: radial-gradient(circle at 80% 70%, hsla(282, 82%, 54%, .3) 0%, transparent 50%); }
+        .aurora-3 { background: radial-gradient(circle at 40% 80%, hsla(210, 89%, 60%, .3) 0%, transparent 50%); }
+        .aurora-4 { background: radial-gradient(circle at 70% 20%, hsla(35, 90%, 60%, .3) 0%, transparent 50%); }
+
+        /* --- Typography & Cards --- */
+        .playfair { font-family: 'Playfair Display', serif; }
+        
+        .text-gradient {
+            background: linear-gradient(to right, #fff, #ffb6c1, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shine 5s linear infinite;
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-radius: 24px;
+            display: none; /* Controlled by JS */
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .glass-card.active {
+            display: block;
+        }
+
+        /* --- Buttons --- */
+        .btn-primary {
+            background: linear-gradient(45deg, #ff2d55, #ff5e3a);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 20px rgba(255, 45, 85, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 0 30px rgba(255, 45, 85, 0.6);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        /* --- Progress Bar --- */
+        .progress-container {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 100;
+        }
+
+        #progress-bar {
+            width: 20%;
+            height: 100%;
+            background: linear-gradient(to right, #ff2d55, #ffcc00);
+            transition: width 0.6s ease;
+        }
+
+        /* --- Polaroid --- */
+        .polaroid {
+            background: white;
+            padding: 12px 12px 40px 12px;
+            transform: rotate(-3deg);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.5s ease;
+        }
+
+        .polaroid img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            filter: sepia(0.2);
+        }
+
+        /* --- Bento Grid --- */
+        .bento-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        #three-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Components -->
+    <div class="aurora-bg">
+        <div class="aurora-layer aurora-1"></div>
+        <div class="aurora-layer aurora-2"></div>
+        <div class="aurora-layer aurora-3"></div>
+        <div class="aurora-layer aurora-4"></div>
+    </div>
+    <div id="three-container"></div>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="relative z-10 min-h-screen flex items-center justify-center p-6">
+        
+        <!-- Step 1: The Grand Welcome -->
+        <div id="step-1" class="glass-card active max-w-lg w-full p-8 text-center">
+            <div class="text-6xl mb-6 animate-bounce">❤️</div>
+            <h1 class="playfair text-4xl md:text-5xl font-bold mb-6 text-gradient">Eii Chiroyli Princess GULSINA,</h1>
+            <p class="text-lg text-gray-300 mb-8 leading-relaxed">
+                Men sen uchun kichik bir dunyo yaratdim, faqatgina ushbu maxsus oy munosabati bilan sening yuzingda biroz tabassum uyg'otish uchun.
+            </p>
+            <button onclick="nextStep(2)" class="btn-primary px-8 py-4 rounded-full font-semibold text-white tracking-wide">
+                Keling boshlaymiz
+            </button>
+        </div>
+
+        <!-- Step 2: The Core Message -->
+        <div id="step-2" class="glass-card max-w-2xl w-full p-8 md:p-12">
+            <div class="text-5xl mb-6">🎉</div>
+            <h2 class="playfair text-4xl font-bold mb-6 text-gradient">Happy BirthMonth (15 April)!</h2>
+            <div class="space-y-4 text-gray-300 leading-relaxed overflow-y-auto max-h-[50vh] pr-4">
+                <p>Siz orqali dunyo yanada yorqinroq bo'ladigan yana bir yil. Sizning borligingiz bir tuhfa va men buni ko'rib turganimdan juda baxtiyorman.</p>
+                <p>Sizning muloyim va sehrli tabassumingiz meni har doim hayratda qoldiradi, qalbimni eritib yuboradi. Ko'zlaringiz meni har doim hammadan ko'proq o'ziga tortadi. Ko'zlaringizda minglab ertaknamo manzaralarni ko'raman.💗💖</p>
+                <p>Siz qanchalik go'zal inson bo'lsangiz, shunchalik mehnatkashsiz. Inshaalloh, barcha qiyinchiliklaringiz bir kun muvaffaqiyatga aylanadi. Barcha orzularingiz ushalsin, ular bilan birga mening orzum ham ushalsin😉. Har doim sog'-salomat va tinchlikda bo'l, mening eng sevimli Gulso'yim.</p>
+            </div>
+            <button onclick="nextStep(3)" class="btn-primary mt-8 px-8 py-3 rounded-full font-semibold text-white">
+                There's more...
+            </button>
+        </div>
+
+        <!-- Step 3: Bento Grid Reasons -->
+        <div id="step-3" class="glass-card max-w-3xl w-full p-8">
+            <h2 class="playfair text-3xl font-bold mb-8 text-center text-gradient">Siz haqingizda menga yoqadigan ba'zi narsalar</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bento-item md:col-span-2">
+                    <h3 class="text-pink-400 font-bold mb-2">✨ Sizning mehribonligingiz va saxovatingiz</h3>
+                    <p class="text-sm text-gray-400">Hamma uchun ko'rsatadigan chinakam samimiy iliqligingiz haqiqatan ham kamyob va go'zaldir.</p>
+                </div>
+                <div class="bento-item">
+                    <h3 class="text-pink-400 font-bold mb-2">😊 O'sha tabassum</h3>
+                    <p class="text-sm text-gray-400">Dunyoga sehrli so'zlarning bir signali.</p>
+                </div>
+                <div class="bento-item">
+                    <h3 class="text-pink-400 font-bold mb-2">🌟 Yorqin energiya</h3>
+                    <p class="text-sm text-gray-400">Sizning yoningizda hamma narsa imkonli tuyuladi.</p>
+                </div>
+            </div>
+            <div class="text-center mt-8">
+                <button onclick="nextStep(4)" class="btn-primary px-8 py-3 rounded-full font-semibold text-white">
+                    Remember this?
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 4: Shared Memory -->
+        <div id="step-4" class="glass-card max-w-xl w-full p-8 text-center">
+            <h2 class="playfair text-3xl font-bold mb-8 text-gradient">That One Time...</h2>
+            <div class="flex justify-center mb-8">
+                <div class="polaroid" id="memory-polaroid">
+                    <img src="https://ibb.co.com/NnGYb4vM" alt="Memory">
+                    <p class="mt-4 text-gray-800 font-medium italic">memory.</p>
+                </div>
+            </div>
+            <p class="text-gray-300 italic mb-8">
+                "Siz bilan gaplashib o'tkazgan har bir lahzam xuddi aqldan ozgan yozuvchi tomonidan yozilgan ertaknamo hikoyaga o'xshaydi..."
+            </p>
+            <button onclick="nextStep(5)" class="btn-primary px-8 py-3 rounded-full font-semibold text-white">
+                One last thing...
+            </button>
+        </div>
+
+        <!-- Step 5: Final Wish -->
+        <div id="step-5" class="glass-card max-w-lg w-full p-8 text-center">
+            <div class="text-6xl mb-6">🎂</div>
+            <h2 class="playfair text-4xl font-bold mb-6 text-gradient">My Wish For You</h2>
+            <p class="text-gray-300 mb-8 leading-relaxed">
+                Kelgusi yil sizga munosib bo'lgan barcha sevgi, muvaffaqiyat va cheksiz baxtni olib kelsin. Orzularingiz har qachongidan ham balandroq parvoz qilsin... Meni tush kabi unuting, lekin o'sha ozgina azobni ham chekmasligingiz uchun men qo'limdan kelgancha harakat qilyapman.
+            </p>
+            
+            <div id="final-reveal" class="hidden mb-8">
+                <h3 class="playfair text-3xl text-pink-400 font-bold animate-pulse">Happy BirthMonth, my crush! ❤️</h3>
+            </div>
+
+            <button id="celebrate-btn" onclick="celebrateSequence()" class="btn-primary px-10 py-4 rounded-full font-bold text-white uppercase tracking-widest">
+                Celebrate!
+            </button>
+        </div>
+
+    </main>
+
+    <script>
+        // --- Initialize Step Visibility ---
+        gsap.to(".active", { opacity: 1, y: 0, duration: 1 });
+
+        function nextStep(stepNumber) {
+            const current = document.querySelector('.glass-card.active');
+            const next = document.getElementById(`step-${stepNumber}`);
+            
+            // Update Progress Bar
+            gsap.to("#progress-bar", { width: `${stepNumber * 20}%`, duration: 0.5 });
+
+            // Transition Logic
+            gsap.to(current, { 
+                opacity: 0, 
+                y: -20, 
+                scale: 0.95,
+                duration: 0.5, 
+                onComplete: () => {
+                    current.classList.remove('active');
+                    next.classList.add('active');
+                    gsap.fromTo(next, 
+                        { opacity: 0, y: 30, scale: 0.95 },
+                        { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power2.out" }
+                    );
+                }
+            });
+        }
+
+        // --- Three.js 3D Hearts Background ---
+        let scene, camera, renderer, hearts = [];
+        const container = document.getElementById('three-container');
+
+        function initThree() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            const heartShape = new THREE.Shape();
+            heartShape.moveTo(25, 25);
+            heartShape.bezierCurveTo(25, 25, 20, 0, 0, 0);
+            heartShape.bezierCurveTo(-30, 0, -30, 35, -30, 35);
+            heartShape.bezierCurveTo(-30, 55, -10, 77, 25, 95);
+            heartShape.bezierCurveTo(60, 77, 80, 55, 80, 35);
+            heartShape.bezierCurveTo(80, 35, 80, 0, 50, 0);
+            heartShape.bezierCurveTo(35, 0, 25, 25, 25, 25);
+
+            const extrudeSettings = { depth: 8, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
+            const geometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
+            geometry.scale(0.01, 0.01, 0.01);
+            geometry.rotateX(Math.PI);
+
+            const material = new THREE.MeshPhongMaterial({ 
+                color: 0xff2d55, 
+                shininess: 100,
+                emissive: 0x220000 
+            });
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            const pointLight = new THREE.PointLight(0xffffff, 1);
+            pointLight.position.set(10, 10, 10);
+            scene.add(pointLight);
+
+            for (let i = 0; i < 25; i++) {
+                const heart = new THREE.Mesh(geometry, material);
+                heart.position.set(
+                    (Math.random() - 0.5) * 15,
+                    (Math.random() - 0.5) * 15,
+                    (Math.random() - 0.5) * 10 - 5
+                );
+                heart.rotation.y = Math.random() * Math.PI;
+                heart.scale.setScalar(Math.random() * 0.5 + 0.5);
+                heart.userData = {
+                    speed: Math.random() * 0.01 + 0.005,
+                    offset: Math.random() * Math.PI * 2
+                };
+                hearts.push(heart);
+                scene.add(heart);
+            }
+            camera.position.z = 5;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            hearts.forEach(heart => {
+                heart.rotation.y += heart.userData.speed;
+                heart.position.y += Math.sin(Date.now() * 0.001 + heart.userData.offset) * 0.002;
+            });
+            renderer.render(scene, camera);
+        }
+
+        // --- Grand Finale Sequence ---
+        function celebrateSequence() {
+            const btn = document.getElementById('celebrate-btn');
+            const finalReveal = document.getElementById('final-reveal');
+            
+            btn.style.pointerEvents = 'none';
+            gsap.to(btn, { opacity: 0, scale: 0.5, duration: 0.5 });
+            
+            // Show final text
+            setTimeout(() => {
+                finalReveal.classList.remove('hidden');
+                gsap.fromTo(finalReveal, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 1 });
+            }, 500);
+
+            // Confetti Bursts
+            const duration = 5 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+
+                const particleCount = 50 * (timeLeft / duration);
+                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+                
+                // Emoji Confetti
+                confetti({
+                    particleCount: 2,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    shapes: ['circle'],
+                    colors: ['#ff2d55', '#ffcc00']
+                });
+            }, 250);
+
+            // Three.js hearts fly away
+            hearts.forEach((heart, i) => {
+                gsap.to(heart.position, {
+                    y: 20,
+                    x: (Math.random() - 0.5) * 20,
+                    duration: 3 + Math.random() * 2,
+                    ease: "power2.in",
+                    delay: i * 0.05
+                });
+                gsap.to(heart.material, { opacity: 0, duration: 2, delay: 2 });
+            });
+        }
+
+        // --- Interaction: Polaroid Parallax ---
+        const polaroid = document.getElementById('memory-polaroid');
+        document.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+            if(polaroid.parentElement.parentElement.classList.contains('active')) {
+                polaroid.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg) rotateZ(-3deg)`;
+            }
+        });
+
+        // Window Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Start
+        initThree();
+        animate();
+    </script>
+</body>
+</html>
